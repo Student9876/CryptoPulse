@@ -5,8 +5,13 @@ from httpx import ASGITransport, AsyncClient
 from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker, create_async_engine
 from sqlalchemy.pool import StaticPool
 
+from app.core.config import settings
 from app.db.base import Base
 import app.models  # noqa: F401
+
+# Disable background live WebSocket ingestion during unit test runs
+settings.ENABLE_INGESTION = False
+
 from app.main import app
 
 

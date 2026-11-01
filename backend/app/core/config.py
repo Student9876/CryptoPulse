@@ -46,13 +46,19 @@ class Settings(BaseSettings):
     )
 
     # Binance WebSocket Market Ingestion
+    # data-stream.binance.vision is Binance's official public market data gateway
+    # (globally accessible without regional cloud/ISP IP blocks)
     BINANCE_WS_URL: str = Field(
-        default="wss://stream.binance.com:9443/stream",
+        default="wss://data-stream.binance.vision/stream",
         description="Base WebSocket URL for Binance combined stream",
     )
     TRACKED_SYMBOLS: List[str] = Field(
         default=["btcusdt", "ethusdt", "solusdt"],
         description="List of trading pairs to ingest and compute metrics for",
+    )
+    ENABLE_INGESTION: bool = Field(
+        default=True,
+        description="Automatically start live market data ingestion on application startup",
     )
 
     # Telegram Bot Configuration
