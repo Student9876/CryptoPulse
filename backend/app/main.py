@@ -5,7 +5,8 @@ manages startup/shutdown lifespans, and mounts core routing endpoints.
 """
 
 from contextlib import asynccontextmanager
-from typing import AsyncGenerator, Optional
+from datetime import datetime, timezone
+from typing import AsyncGenerator, Dict, Optional
 
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
@@ -14,6 +15,7 @@ from app.core.config import settings
 from app.core.logging import get_logger, setup_logging
 from app.schemas.events import TradeEvent
 from app.services.binance_ws import BinanceWebSocketClient
+from app.services.window_engine import WindowEngine
 
 logger = get_logger("cryptopulse.main")
 
@@ -25,19 +27,41 @@ async def lifespan(app: FastAPI) -> AsyncGenerator[None, None]:
     logger.info("Starting %s v%s...", settings.PROJECT_NAME, settings.VERSION)
     logger.info("Tracked symbols configured: %s", settings.TRACKED_SYMBOLS)
 
+    # Initialize in-memory rolling window metrics engine
+    window_engine = WindowEngine(symbols=settings.TRACKED_SYMBOLS)
+    app.state.window_engine = window_engine
+
     ws_client: Optional[BinanceWebSocketClient] = None
 
     if settings.ENABLE_INGESTION:
+        # Throttle periodic terminal metrics logging to once per 2 seconds per symbol
+        last_logged_at: Dict[str, float] = {}
+
         async def on_trade_received(trade: TradeEvent) -> None:
-            """Handler for real-time trade events."""
-            aggressor = "BUY " if not trade.is_buyer_maker else "SELL"
-            logger.info(
-                "TRADE | %-8s | $%10.2f | Qty: %-8.4f | [%s]",
-                trade.symbol,
-                trade.price,
-                trade.quantity,
-                aggressor,
-            )
+            """Feeds incoming trade into sliding window and logs rolling analytics."""
+            window_engine.process_trade(trade)
+
+            # Check if 2 seconds have elapsed since last terminal summary for this symbol
+            now_ts = datetime.now(timezone.utc).timestamp()
+            last_ts = last_logged_at.get(trade.symbol, 0.0)
+
+            if now_ts - last_ts >= 2.0:
+                last_logged_at[trade.symbol] = now_ts
+                metrics = window_engine.get_metrics(trade.symbol)
+                if metrics:
+                    sign = "+" if metrics.price_change_5m_pct >= 0 else ""
+                    logger.info(
+                        "METRICS | %-8s | $%10.2f | 5m: %s%5.2f%% | VWAP: $%10.2f | "
+                        "VolSpike: %4.1fx | TakerBuy: %4.1f%% | TPS: %-4.1f",
+                        metrics.symbol,
+                        metrics.current_price,
+                        sign,
+                        metrics.price_change_5m_pct,
+                        metrics.vwap_5m,
+                        metrics.volume_spike_ratio,
+                        metrics.taker_buy_ratio_pct,
+                        metrics.trades_per_second,
+                    )
 
         logger.info("Initializing Binance live market ingestion...")
         ws_client = BinanceWebSocketClient(on_trade=on_trade_received)
