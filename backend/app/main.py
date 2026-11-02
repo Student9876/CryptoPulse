@@ -15,6 +15,7 @@ from app.core.config import settings
 from app.core.logging import get_logger, setup_logging
 from app.schemas.events import TradeEvent
 from app.services.binance_ws import BinanceWebSocketClient
+from app.services.rule_engine import RuleEngine
 from app.services.window_engine import WindowEngine
 
 logger = get_logger("cryptopulse.main")
@@ -27,9 +28,11 @@ async def lifespan(app: FastAPI) -> AsyncGenerator[None, None]:
     logger.info("Starting %s v%s...", settings.PROJECT_NAME, settings.VERSION)
     logger.info("Tracked symbols configured: %s", settings.TRACKED_SYMBOLS)
 
-    # Initialize in-memory rolling window metrics engine
+    # Initialize in-memory rolling window metrics engine and rule engine
     window_engine = WindowEngine(symbols=settings.TRACKED_SYMBOLS)
+    rule_engine = RuleEngine()
     app.state.window_engine = window_engine
+    app.state.rule_engine = rule_engine
 
     ws_client: Optional[BinanceWebSocketClient] = None
 
@@ -38,17 +41,27 @@ async def lifespan(app: FastAPI) -> AsyncGenerator[None, None]:
         last_logged_at: Dict[str, float] = {}
 
         async def on_trade_received(trade: TradeEvent) -> None:
-            """Feeds incoming trade into sliding window and logs rolling analytics."""
+            """Feeds incoming trade into sliding window and evaluates alert rules."""
             window_engine.process_trade(trade)
 
-            # Check if 2 seconds have elapsed since last terminal summary for this symbol
-            now_ts = datetime.now(timezone.utc).timestamp()
-            last_ts = last_logged_at.get(trade.symbol, 0.0)
+            metrics = window_engine.get_metrics(trade.symbol)
+            if metrics:
+                # 1. Evaluate active alert rules
+                alerts = rule_engine.evaluate_metrics(metrics)
+                for alert in alerts:
+                    logger.warning(
+                        "DISPATCH QUEUE: Alert generated for user %d (Rule #%d on %s)",
+                        alert.user_id,
+                        alert.rule_id,
+                        alert.symbol,
+                    )
 
-            if now_ts - last_ts >= 2.0:
-                last_logged_at[trade.symbol] = now_ts
-                metrics = window_engine.get_metrics(trade.symbol)
-                if metrics:
+                # 2. Check if 2 seconds have elapsed since last terminal summary for this symbol
+                now_ts = datetime.now(timezone.utc).timestamp()
+                last_ts = last_logged_at.get(trade.symbol, 0.0)
+
+                if now_ts - last_ts >= 2.0:
+                    last_logged_at[trade.symbol] = now_ts
                     sign = "+" if metrics.price_change_5m_pct >= 0 else ""
                     logger.info(
                         "METRICS | %-8s | $%10.2f | 5m: %s%5.2f%% | VWAP: $%10.2f | "

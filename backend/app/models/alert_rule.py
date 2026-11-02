@@ -14,6 +14,7 @@ if TYPE_CHECKING:
 
 class MetricType(str, Enum):
     """Supported market metrics for rule evaluation."""
+    PRICE_LEVEL = "PRICE_LEVEL"
     PRICE_CHANGE = "PRICE_CHANGE"
     VOLUME_SPIKE = "VOLUME_SPIKE"
     VOLATILITY = "VOLATILITY"
