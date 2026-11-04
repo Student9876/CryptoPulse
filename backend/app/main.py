@@ -11,12 +11,12 @@ from typing import AsyncGenerator, Dict, Optional
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
+from app.bot import TelegramBotService
 from app.core.config import settings
 from app.core.logging import get_logger, setup_logging
+from app.rules import RuleEngine
 from app.schemas.events import TradeEvent
-from app.services.binance_ws import BinanceWebSocketClient
-from app.services.rule_engine import RuleEngine
-from app.services.window_engine import WindowEngine
+from app.stream import BinanceWebSocketClient, WindowManager
 
 logger = get_logger("cryptopulse.main")
 
@@ -29,10 +29,15 @@ async def lifespan(app: FastAPI) -> AsyncGenerator[None, None]:
     logger.info("Tracked symbols configured: %s", settings.TRACKED_SYMBOLS)
 
     # Initialize in-memory rolling window metrics engine and rule engine
-    window_engine = WindowEngine(symbols=settings.TRACKED_SYMBOLS)
+    window_engine = WindowManager(symbols=settings.TRACKED_SYMBOLS)
     rule_engine = RuleEngine()
     app.state.window_engine = window_engine
     app.state.rule_engine = rule_engine
+
+    # Initialize Telegram Bot service and background alert dispatcher
+    bot_service = TelegramBotService(rule_engine=rule_engine, window_engine=window_engine)
+    await bot_service.start()
+    app.state.bot_service = bot_service
 
     ws_client: Optional[BinanceWebSocketClient] = None
 
@@ -86,6 +91,8 @@ async def lifespan(app: FastAPI) -> AsyncGenerator[None, None]:
     logger.info("Shutting down %s...", settings.PROJECT_NAME)
     if ws_client:
         await ws_client.stop()
+    if bot_service:
+        await bot_service.stop()
 
 
 def create_application() -> FastAPI:

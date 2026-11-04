@@ -70,6 +70,10 @@ class Settings(BaseSettings):
         default="",
         description="Public HTTPS endpoint where Telegram will deliver updates",
     )
+    MINI_APP_URL: str = Field(
+        default="",
+        description="Public HTTPS URL where the Telegram Mini App frontend is hosted",
+    )
 
     @field_validator("TRACKED_SYMBOLS", mode="before")
     @classmethod
