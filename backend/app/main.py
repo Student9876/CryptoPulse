@@ -11,6 +11,7 @@ from typing import AsyncGenerator, Dict, Optional
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
+from app.api.v1.router import api_v1_router
 from app.bot import TelegramBotService
 from app.core.config import settings
 from app.core.logging import get_logger, setup_logging
@@ -112,6 +113,9 @@ def create_application() -> FastAPI:
         allow_methods=["*"],
         allow_headers=["*"],
     )
+
+    # Mount API version 1 endpoints
+    app.include_router(api_v1_router, prefix=settings.API_V1_STR)
 
     @app.get("/healthz", tags=["Health"])
     async def health_check() -> dict:

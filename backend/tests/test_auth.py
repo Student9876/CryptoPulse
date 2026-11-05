@@ -62,3 +62,4 @@ async def test_get_current_user_missing_header(db_session: AsyncSession):
     with pytest.raises(HTTPException) as exc:
         await get_current_user(db=db_session)
     assert exc.value.status_code == 401
+
