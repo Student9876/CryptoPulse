@@ -62,25 +62,26 @@ async def lifespan(app: FastAPI) -> AsyncGenerator[None, None]:
                         alert.symbol,
                     )
 
-                # 2. Check if 2 seconds have elapsed since last terminal summary for this symbol
-                now_ts = datetime.now(timezone.utc).timestamp()
-                last_ts = last_logged_at.get(trade.symbol, 0.0)
+                # 2. Check if terminal console ticker stream is enabled in settings
+                if settings.ENABLE_CONSOLE_FEED:
+                    now_ts = datetime.now(timezone.utc).timestamp()
+                    last_ts = last_logged_at.get(trade.symbol, 0.0)
 
-                if now_ts - last_ts >= 2.0:
-                    last_logged_at[trade.symbol] = now_ts
-                    sign = "+" if metrics.price_change_5m_pct >= 0 else ""
-                    logger.info(
-                        "METRICS | %-8s | $%10.2f | 5m: %s%5.2f%% | VWAP: $%10.2f | "
-                        "VolSpike: %4.1fx | TakerBuy: %4.1f%% | TPS: %-4.1f",
-                        metrics.symbol,
-                        metrics.current_price,
-                        sign,
-                        metrics.price_change_5m_pct,
-                        metrics.vwap_5m,
-                        metrics.volume_spike_ratio,
-                        metrics.taker_buy_ratio_pct,
-                        metrics.trades_per_second,
-                    )
+                    if now_ts - last_ts >= 2.0:
+                        last_logged_at[trade.symbol] = now_ts
+                        sign = "+" if metrics.price_change_5m_pct >= 0 else ""
+                        logger.info(
+                            "METRICS | %-8s | $%10.2f | 5m: %s%5.2f%% | VWAP: $%10.2f | "
+                            "VolSpike: %4.1fx | TakerBuy: %4.1f%% | TPS: %-4.1f",
+                            metrics.symbol,
+                            metrics.current_price,
+                            sign,
+                            metrics.price_change_5m_pct,
+                            metrics.vwap_5m,
+                            metrics.volume_spike_ratio,
+                            metrics.taker_buy_ratio_pct,
+                            metrics.trades_per_second,
+                        )
 
         logger.info("Initializing Binance live market ingestion...")
         ws_client = BinanceWebSocketClient(on_trade=on_trade_received)

@@ -91,6 +91,18 @@ class Settings(BaseSettings):
         default=True,
         description="Automatically start live market data ingestion on application startup",
     )
+    ENABLE_CONSOLE_FEED: bool = Field(
+        default=False,
+        description="Whether to periodically log live trade metrics tickers to the terminal console",
+    )
+
+    @field_validator("ENABLE_CONSOLE_FEED", mode="before")
+    @classmethod
+    def parse_console_feed(cls, value: Union[bool, str]) -> bool:
+        """Safely parses boolean console feed flag."""
+        if isinstance(value, str):
+            return value.strip().lower() in ("true", "1", "yes", "on", "enable", "enabled")
+        return bool(value)
 
     # Telegram Bot Configuration
     TELEGRAM_BOT_TOKEN: str = Field(

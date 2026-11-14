@@ -9,8 +9,9 @@ from app.core.config import settings
 from app.db.base import Base
 import app.models  # noqa: F401
 
-# Disable background live WebSocket ingestion during unit test runs
+# Disable background live WebSocket ingestion and force debug mode during unit tests
 settings.ENABLE_INGESTION = False
+settings.DEBUG = True
 
 from app.main import app
 
