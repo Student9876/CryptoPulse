@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useState } from 'react'
+import { getApiUrl } from '@/lib/api'
 import { getAuthHeaders, triggerHaptic } from '@/lib/telegram'
 import type { AlertRule, CreateRuleInput } from '@/types/rules'
 
@@ -12,7 +13,7 @@ export function useAlertRules() {
     setIsLoading(true)
     setError(null)
     try {
-      const res = await fetch('/api/v1/rules/', {
+      const res = await fetch(getApiUrl('/api/v1/rules/'), {
         headers: getAuthHeaders(),
       })
       if (!res.ok) throw new Error('Failed to fetch alert rules')
@@ -31,7 +32,7 @@ export function useAlertRules() {
 
   const createRule = async (input: CreateRuleInput): Promise<boolean> => {
     try {
-      const res = await fetch('/api/v1/rules/', {
+      const res = await fetch(getApiUrl('/api/v1/rules/'), {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -53,7 +54,7 @@ export function useAlertRules() {
 
   const deleteRule = async (ruleId: number): Promise<boolean> => {
     try {
-      const res = await fetch(`/api/v1/rules/${ruleId}`, {
+      const res = await fetch(getApiUrl(`/api/v1/rules/${ruleId}`), {
         method: 'DELETE',
         headers: getAuthHeaders(),
       })

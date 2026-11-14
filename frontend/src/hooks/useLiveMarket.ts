@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react'
+import { getApiUrl } from '@/lib/api'
 import type { MarketOverview } from '@/types/market'
 
 /** Hook that streams live market overview snapshots via Server-Sent Events (SSE). */
@@ -14,7 +15,7 @@ export function useLiveMarket() {
     // 1. Initial snapshot fetch for instant load
     const fetchInitial = async () => {
       try {
-        const res = await fetch('/api/v1/analytics/overview')
+        const res = await fetch(getApiUrl('/api/v1/analytics/overview'))
         if (res.ok) {
           const data: MarketOverview = await res.json()
           setOverview(data)
@@ -29,7 +30,7 @@ export function useLiveMarket() {
     // 2. Connect to real-time SSE stream
     const connectSSE = () => {
       setFeedStatus('reconnecting')
-      eventSource = new EventSource('/api/v1/stream/overview')
+      eventSource = new EventSource(getApiUrl('/api/v1/stream/overview'))
 
       eventSource.onopen = () => {
         setFeedStatus('connected')

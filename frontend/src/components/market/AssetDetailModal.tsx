@@ -11,6 +11,7 @@ import {
   DialogTitle,
 } from '@/components/ui/dialog'
 import { SparklineChart } from '@/components/market/SparklineChart'
+import { getApiUrl } from '@/lib/api'
 import { formatCurrency, formatPercent } from '@/lib/utils'
 import type { SymbolAnalytics } from '@/types/market'
 
@@ -36,7 +37,7 @@ export const AssetDetailModal: React.FC<AssetDetailModalProps> = ({
     const fetchDetail = async () => {
       setIsLoading(true)
       try {
-        const res = await fetch(`/api/v1/analytics/${symbol}`)
+        const res = await fetch(getApiUrl(`/api/v1/analytics/${symbol}`))
         if (res.ok) {
           const json: SymbolAnalytics = await res.json()
           setData(json)

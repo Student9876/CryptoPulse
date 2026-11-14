@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useState } from 'react'
+import { getApiUrl } from '@/lib/api'
 import { getAuthHeaders } from '@/lib/telegram'
 import type { AlertHistoryItem } from '@/types/history'
 
@@ -12,10 +13,10 @@ export function useAlertHistory(symbolFilter?: string) {
     setIsLoading(true)
     setError(null)
     try {
-      const url = symbolFilter
+      const path = symbolFilter
         ? `/api/v1/history/?symbol=${encodeURIComponent(symbolFilter)}`
         : '/api/v1/history/'
-      const res = await fetch(url, {
+      const res = await fetch(getApiUrl(path), {
         headers: getAuthHeaders(),
       })
       if (!res.ok) throw new Error('Failed to load alert history')
