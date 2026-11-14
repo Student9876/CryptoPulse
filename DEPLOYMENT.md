@@ -97,7 +97,7 @@ This will create the `users`, `alert_rules`, and `alert_history` tables on Neon 
    - **Framework Preset:** Vite
    - **Root Directory:** `frontend`
 4. Under **Environment Variables**, add:
-   - `VITE_BACKEND_URL`: `https://cryptopulse-backend-yourname.koyeb.app`
+   - `BACKEND_URL`: `https://your-backend-app.onrender.com` (or Koyeb URL)
 5. Click **Deploy**. You will receive a production URL (e.g. `https://cryptopulse.vercel.app`).
 
 ---
