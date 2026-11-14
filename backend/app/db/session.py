@@ -10,10 +10,22 @@ from sqlalchemy.ext.asyncio import (
 
 from app.core.config import settings
 
+def get_async_engine_url(raw_url: str) -> str:
+    """Defensively ensures asyncpg driver and valid SSL parameters are used."""
+    url = str(raw_url)
+    if url.startswith("postgres://"):
+        url = url.replace("postgres://", "postgresql+asyncpg://", 1)
+    elif url.startswith("postgresql://") and not url.startswith("postgresql+asyncpg://"):
+        url = url.replace("postgresql://", "postgresql+asyncpg://", 1)
+    if "sslmode=" in url:
+        url = url.replace("sslmode=", "ssl=")
+    return url
+
+
 # Initialize asynchronous engine with connection health checks
 # pool_pre_ping=True tests connections prior to checkout to discard stale connections
 engine: AsyncEngine = create_async_engine(
-    settings.DATABASE_URL,
+    get_async_engine_url(settings.DATABASE_URL),
     echo=settings.DEBUG,
     pool_pre_ping=True,
 )
