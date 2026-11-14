@@ -45,6 +45,18 @@ class Settings(BaseSettings):
         description="Async PostgreSQL connection string",
     )
 
+    @field_validator("DATABASE_URL", mode="before")
+    @classmethod
+    def assemble_async_db_url(cls, value: str) -> str:
+        """Ensures cloud database URLs (e.g. Neon, Render) use the asyncpg driver prefix."""
+        if not isinstance(value, str) or not value:
+            return value
+        if value.startswith("postgres://"):
+            return value.replace("postgres://", "postgresql+asyncpg://", 1)
+        if value.startswith("postgresql://") and not value.startswith("postgresql+asyncpg://"):
+            return value.replace("postgresql://", "postgresql+asyncpg://", 1)
+        return value
+
     # Binance WebSocket Market Ingestion
     # data-stream.binance.vision is Binance's official public market data gateway
     # (globally accessible without regional cloud/ISP IP blocks)
