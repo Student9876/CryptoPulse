@@ -1,9 +1,16 @@
 import asyncio
 from logging.config import fileConfig
+from pathlib import Path
+import sys
 
 from sqlalchemy import pool
 from sqlalchemy.engine import Connection
 from sqlalchemy.ext.asyncio import async_engine_from_config
+
+# Ensure backend root directory is in sys.path so 'app' package resolves
+backend_dir = Path(__file__).resolve().parent.parent
+if str(backend_dir) not in sys.path:
+    sys.path.insert(0, str(backend_dir))
 
 from alembic import context
 from app.core.config import settings

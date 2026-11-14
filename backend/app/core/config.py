@@ -13,7 +13,7 @@ class Settings(BaseSettings):
     """Global configuration settings fxxxor CryptoPulse."""
 
     model_config = SettingsConfigDict(
-        env_file=".env",
+        env_file=(".env", "backend/.env"),
         env_file_encoding="utf-8",
         case_sensitive=True,
         extra="ignore",
@@ -48,14 +48,33 @@ class Settings(BaseSettings):
     @field_validator("DATABASE_URL", mode="before")
     @classmethod
     def assemble_async_db_url(cls, value: str) -> str:
-        """Ensures cloud database URLs (e.g. Neon, Render) use the asyncpg driver prefix."""
+        """Ensures cloud database URLs (e.g. Neon, Render) use asyncpg and valid SSL query params."""
         if not isinstance(value, str) or not value:
             return value
-        if value.startswith("postgres://"):
-            return value.replace("postgres://", "postgresql+asyncpg://", 1)
-        if value.startswith("postgresql://") and not value.startswith("postgresql+asyncpg://"):
-            return value.replace("postgresql://", "postgresql+asyncpg://", 1)
-        return value
+
+        if "sqlite" in value:
+            return value
+
+        import urllib.parse
+
+        parsed = urllib.parse.urlsplit(value)
+        params = urllib.parse.parse_qs(parsed.query)
+        clean_params = {}
+
+        # asyncpg requires ssl= instead of libpq params (sslmode, channel_binding)
+        if "sslmode" in params or "ssl" in params:
+            clean_params["ssl"] = "require"
+
+        for k in ("server_settings", "command_timeout"):
+            if k in params:
+                clean_params[k] = params[k][0]
+
+        new_query = urllib.parse.urlencode(clean_params)
+        scheme = parsed.scheme
+        if scheme in ("postgres", "postgresql"):
+            scheme = "postgresql+asyncpg"
+
+        return urllib.parse.urlunsplit((scheme, parsed.netloc, parsed.path, new_query, parsed.fragment))
 
     # Binance WebSocket Market Ingestion
     # data-stream.binance.vision is Binance's official public market data gateway
