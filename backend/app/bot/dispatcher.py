@@ -4,10 +4,12 @@ import asyncio
 from typing import Optional
 from aiogram import Bot
 from aiogram.enums import ParseMode
+from sqlalchemy import update
 
 from app.core.logging import get_logger
 from app.db.session import AsyncSessionLocal
 from app.models.alert_history import AlertHistory
+from app.models.alert_rule import AlertRule, MetricType
 from app.rules.evaluator import RuleEngine
 from app.schemas.events import AlertEvent
 
@@ -37,7 +39,7 @@ class AlertDispatcher:
                     except Exception as err:
                         logger.error("Failed to send Telegram message to #%d: %s", event.telegram_id, err)
 
-                # 2. Database Audit Persistence
+                # 2. Database Audit Persistence & One-Shot Price Target Deactivation
                 try:
                     async with AsyncSessionLocal() as session:
                         session.add(AlertHistory(
@@ -49,6 +51,16 @@ class AlertDispatcher:
                             message=event.message,
                             triggered_at=event.triggered_at,
                         ))
+
+                        if event.metric_type == MetricType.PRICE_LEVEL.value:
+                            await session.execute(
+                                update(AlertRule)
+                                .where(AlertRule.id == event.rule_id)
+                                .values(is_active=False)
+                            )
+                            self.rule_engine.unregister_rule(event.rule_id)
+                            logger.info("Price target achieved for rule #%d. Auto-deactivated.", event.rule_id)
+
                         await session.commit()
                 except Exception as db_err:
                     logger.error("Failed to persist alert history: %s", db_err)

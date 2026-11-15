@@ -87,7 +87,7 @@ export const AssetDetailModal: React.FC<AssetDetailModalProps> = ({
             <div className="rounded-xl border border-border/60 bg-card/60 p-3 flex flex-col items-center">
               <div className="w-full flex justify-between text-xs text-muted-foreground mb-2">
                 <span>Current: {formatCurrency(m.current_price)}</span>
-                <span>VWAP: {formatCurrency(m.vwap)}</span>
+                <span>VWAP: {formatCurrency(m.vwap_5m ?? m.vwap ?? m.current_price)}</span>
               </div>
               <SparklineChart
                 points={data?.sparkline}
@@ -114,19 +114,19 @@ export const AssetDetailModal: React.FC<AssetDetailModalProps> = ({
               <div className="rounded-lg bg-secondary/40 p-2 border border-border/40">
                 <div className="text-[10px] text-muted-foreground">Volatility</div>
                 <div className="text-xs font-semibold text-foreground">
-                  {m.volatility_pct.toFixed(2)}%
+                  {(m.volatility_5m ?? m.volatility_pct ?? 0).toFixed(2)}%
                 </div>
               </div>
             </div>
 
             <div className="grid grid-cols-2 gap-2 text-xs">
               <div className="flex justify-between p-2 rounded-lg bg-secondary/20">
-                <span className="text-muted-foreground">5m High:</span>
-                <span className="font-mono font-medium">{formatCurrency(m.high_price_5m)}</span>
+                <span className="text-muted-foreground">15m High:</span>
+                <span className="font-mono font-medium">{formatCurrency(m.high_15m ?? m.high_price_5m ?? m.current_price)}</span>
               </div>
               <div className="flex justify-between p-2 rounded-lg bg-secondary/20">
-                <span className="text-muted-foreground">5m Low:</span>
-                <span className="font-mono font-medium">{formatCurrency(m.low_price_5m)}</span>
+                <span className="text-muted-foreground">15m Low:</span>
+                <span className="font-mono font-medium">{formatCurrency(m.low_15m ?? m.low_price_5m ?? m.current_price)}</span>
               </div>
               <div className="flex justify-between p-2 rounded-lg bg-secondary/20">
                 <span className="text-muted-foreground">Volume Spike:</span>
@@ -134,7 +134,7 @@ export const AssetDetailModal: React.FC<AssetDetailModalProps> = ({
               </div>
               <div className="flex justify-between p-2 rounded-lg bg-secondary/20">
                 <span className="text-muted-foreground">Trades (5m):</span>
-                <span className="font-mono font-medium">{m.trades_count_5m}</span>
+                <span className="font-mono font-medium">{m.trade_count_5m ?? m.trades_count_5m ?? 0}</span>
               </div>
             </div>
 

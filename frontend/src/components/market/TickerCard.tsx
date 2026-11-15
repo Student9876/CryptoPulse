@@ -30,6 +30,11 @@ export const TickerCard: React.FC<TickerCardProps> = ({ metrics, onSelect }) => 
   const isPositive = metrics.price_change_5m_pct >= 0
   const isSpiking = metrics.volume_spike_ratio >= 1.5
 
+  const vwapValue = metrics.vwap_5m ?? metrics.vwap ?? metrics.current_price
+  const takerBuyPct =
+    metrics.taker_buy_ratio_pct ??
+    (metrics.taker_buy_ratio !== undefined ? metrics.taker_buy_ratio * 100 : 50)
+
   const flashClass =
     flash === 'up'
       ? 'bg-emerald-500/10 border-emerald-500/40'
@@ -70,7 +75,7 @@ export const TickerCard: React.FC<TickerCardProps> = ({ metrics, onSelect }) => 
             <span>{formatPercent(metrics.price_change_5m_pct)}</span>
           </Badge>
           <span className="text-[10px] text-muted-foreground font-mono">
-            VWAP {formatCurrency(metrics.vwap)}
+            VWAP {formatCurrency(vwapValue)}
           </span>
         </div>
       </div>
@@ -81,10 +86,10 @@ export const TickerCard: React.FC<TickerCardProps> = ({ metrics, onSelect }) => 
           <div className="w-16 h-1.5 rounded-full bg-rose-500/30 overflow-hidden">
             <div
               className="h-full bg-emerald-500 transition-all duration-300"
-              style={{ width: `${Math.min(Math.max(metrics.taker_buy_ratio * 100, 0), 100)}%` }}
+              style={{ width: `${Math.min(Math.max(takerBuyPct, 0), 100)}%` }}
             />
           </div>
-          <span className="font-mono text-[10px]">{(metrics.taker_buy_ratio * 100).toFixed(0)}%</span>
+          <span className="font-mono text-[10px]">{takerBuyPct.toFixed(0)}%</span>
         </div>
 
         <span className="text-[10px]">5m Vol: {metrics.volume_5m.toFixed(1)}</span>

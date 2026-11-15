@@ -18,8 +18,16 @@ export const HistoryItem: React.FC<HistoryItemProps> = ({ item }) => {
     }
   }
 
+  // Strip Telegram HTML tags and formatting dividers for clean web rendering
+  const cleanMessage = item.message
+    .replace(/<[^>]*>/g, '')
+    .replace(/[─—]{3,}/g, '')
+    .split('\n')
+    .filter((line) => line.trim().length > 0)
+    .join('\n')
+
   return (
-    <Card className="p-3 border-border/50 bg-card/40 space-y-2">
+    <Card className="p-3.5 border-border/50 bg-card/40 space-y-2">
       <div className="flex items-center justify-between">
         <div className="flex items-center space-x-2">
           <Badge variant="outline" className="font-bold text-xs bg-secondary/50">
@@ -37,8 +45,8 @@ export const HistoryItem: React.FC<HistoryItemProps> = ({ item }) => {
         </Badge>
       </div>
 
-      <p className="text-xs text-foreground/90 leading-relaxed font-sans">
-        {item.message}
+      <p className="text-xs text-foreground/90 leading-relaxed font-sans whitespace-pre-line">
+        {cleanMessage}
       </p>
 
       <div className="flex items-center justify-between text-[10px] text-muted-foreground border-t border-border/30 pt-1.5 font-mono">
