@@ -55,7 +55,7 @@ class RuleEngine:
         current_time = now_ts if now_ts is not None else datetime.now(timezone.utc).timestamp()
         triggered: List[AlertEvent] = []
 
-        for rule in self.rules.values():
+        for rule in list(self.rules.values()):
             if not rule.is_active or rule.symbol.upper() != metrics.symbol.upper():
                 continue
 
@@ -68,6 +68,10 @@ class RuleEngine:
                 rule.id, is_met, rule.cooldown_seconds, current_time, is_recurring=rule.is_recurring
             ):
                 self.cooldown_manager.record_trigger(rule.id, current_time)
+                if not rule.is_recurring:
+                    rule.is_active = False
+                    self.rules.pop(rule.id, None)
+
                 event = AlertEvent(
                     rule_id=rule.id,
                     user_id=rule.user_id,

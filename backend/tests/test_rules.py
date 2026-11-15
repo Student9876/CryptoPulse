@@ -112,29 +112,25 @@ def test_vwap_crossover_alert():
     assert alerts[0].actual_value == pytest.approx(5.26, rel=1e-2)
 
 
-def test_cooldown_suppression():
+def test_one_time_alert_auto_deactivates():
     engine = RuleEngine()
     metrics_above = make_test_metrics(current_price=81000.0)
     metrics_below = make_test_metrics(current_price=79000.0)
     engine.register_rule(CachedRule(
         id=6, user_id=5, telegram_id=222, symbol="BTCUSDT",
         metric_type=MetricType.PRICE_LEVEL.value, condition=ConditionType.GREATER_THAN.value,
-        threshold_value=80000.0, cooldown_seconds=300,
+        threshold_value=80000.0, cooldown_seconds=300, is_recurring=False,
     ))
     # 1. First trigger
     assert len(engine.evaluate_metrics(metrics_above, now_ts=1000.0)) == 1
 
-    # 2. Within cooldown period -> suppressed
+    # 2. Rule is immediately deactivated and removed from active rules (one-time trigger)
+    assert 6 not in engine.rules
+
+    # 3. Market moves, dips, or crosses back up -> NEVER triggers again
     assert len(engine.evaluate_metrics(metrics_above, now_ts=1010.0)) == 0
-
-    # 3. After cooldown, but condition never reset (stayed > 80k) -> edge-triggering prevents flood
-    assert len(engine.evaluate_metrics(metrics_above, now_ts=1305.0)) == 0
-
-    # 4. Market drops below threshold -> re-arms the trigger
     assert len(engine.evaluate_metrics(metrics_below, now_ts=1350.0)) == 0
-
-    # 5. Market crosses back up after re-arming and cooled down -> triggers cleanly
-    assert len(engine.evaluate_metrics(metrics_above, now_ts=1400.0)) == 1
+    assert len(engine.evaluate_metrics(metrics_above, now_ts=1400.0)) == 0
 
 
 def test_recurring_alert():

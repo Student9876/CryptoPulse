@@ -33,7 +33,8 @@ class CooldownManager:
           - If is_recurring is False: Only fires if cooled down AND was not already continuously triggered.
         """
         if not is_met:
-            self._active_condition[rule_id] = False
+            if is_recurring:
+                self._active_condition[rule_id] = False
             return False
 
         if not self.is_cooled_down(rule_id, cooldown_seconds, now_ts):

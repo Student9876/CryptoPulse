@@ -39,6 +39,9 @@ class AlertDispatcher:
                     except Exception as err:
                         logger.error("Failed to send Telegram message to #%d: %s", event.telegram_id, err)
 
+                if not event.is_recurring:
+                    self.rule_engine.unregister_rule(event.rule_id)
+
                 # 2. Database Audit Persistence & One-Shot Price Target Deactivation
                 try:
                     async with AsyncSessionLocal() as session:
@@ -58,7 +61,6 @@ class AlertDispatcher:
                                 .where(AlertRule.id == event.rule_id)
                                 .values(is_active=False)
                             )
-                            self.rule_engine.unregister_rule(event.rule_id)
                             logger.info("One-time alert achieved for rule #%d. Auto-deactivated.", event.rule_id)
 
                         await session.commit()

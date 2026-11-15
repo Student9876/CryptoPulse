@@ -15,7 +15,7 @@ import { initTelegramApp, triggerHaptic } from '@/lib/telegram'
 
 export default function App() {
   const { overview, feedStatus } = useLiveMarket()
-  const { rules, isLoading: rulesLoading, createRule, deleteRule } = useAlertRules()
+  const { rules, isLoading: rulesLoading, createRule, deleteRule, refresh: refreshRules } = useAlertRules()
   const { history, isLoading: historyLoading, refresh: refreshHistory } = useAlertHistory()
 
   const [selectedSymbol, setSelectedSymbol] = useState<string | null>(null)
@@ -26,8 +26,13 @@ export default function App() {
     initTelegramApp()
   }, [])
 
-  const handleTabChange = () => {
+  const handleTabChange = (value: string) => {
     triggerHaptic('selection')
+    if (value === 'rules') {
+      refreshRules()
+    } else if (value === 'history') {
+      refreshHistory()
+    }
   }
 
   const handleCreateRuleForAsset = (symbol: string) => {
