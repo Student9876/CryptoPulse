@@ -15,5 +15,6 @@ class CachedRule:
     threshold_value: float
     window_seconds: int = 300
     cooldown_seconds: int = 600
+    is_recurring: bool = False
     is_active: bool = True
 

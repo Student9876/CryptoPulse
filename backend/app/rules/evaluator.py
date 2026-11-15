@@ -64,7 +64,9 @@ class RuleEngine:
                 continue
 
             is_met = actual >= rule.threshold_value if rule.condition == ConditionType.GREATER_THAN.value else actual <= rule.threshold_value
-            if self.cooldown_manager.should_trigger(rule.id, is_met, rule.cooldown_seconds, current_time):
+            if self.cooldown_manager.should_trigger(
+                rule.id, is_met, rule.cooldown_seconds, current_time, is_recurring=rule.is_recurring
+            ):
                 self.cooldown_manager.record_trigger(rule.id, current_time)
                 event = AlertEvent(
                     rule_id=rule.id,
@@ -77,6 +79,7 @@ class RuleEngine:
                     actual_value=round(actual, 4),
                     message=format_alert_message(rule, metrics, actual),
                     triggered_at=datetime.fromtimestamp(current_time, tz=timezone.utc),
+                    is_recurring=rule.is_recurring,
                 )
                 triggered.append(event)
                 self.alert_queue.put_nowait(event)

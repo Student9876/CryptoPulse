@@ -17,6 +17,7 @@ export interface AlertRule {
   threshold_value: number
   window_seconds: number
   cooldown_seconds: number
+  is_recurring: boolean
   is_active: boolean
   created_at: string
 }
@@ -28,4 +29,5 @@ export interface CreateRuleInput {
   threshold_value: number
   window_seconds?: number
   cooldown_seconds?: number
+  is_recurring?: boolean
 }

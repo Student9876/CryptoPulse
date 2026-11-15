@@ -14,6 +14,7 @@ class AlertRuleBase(BaseModel):
     threshold_value: float = Field(..., description="Numeric threshold to compare against")
     window_seconds: int = Field(default=300, ge=10, le=86400, description="Evaluation window duration in seconds")
     cooldown_seconds: int = Field(default=600, ge=0, le=86400, description="Cooldown suppression period in seconds")
+    is_recurring: bool = Field(default=False, description="Whether alert repeats continuously after cooldown or deactivates upon first trigger")
 
 
 class AlertRuleCreate(AlertRuleBase):
@@ -24,6 +25,7 @@ class AlertRuleUpdate(BaseModel):
     is_active: Optional[bool] = None
     threshold_value: Optional[float] = None
     cooldown_seconds: Optional[int] = None
+    is_recurring: Optional[bool] = None
 
 
 class AlertRuleRead(AlertRuleBase):

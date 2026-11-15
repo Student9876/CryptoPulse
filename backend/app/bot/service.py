@@ -40,6 +40,7 @@ async def load_active_rules_into_engine(engine: RuleEngine) -> int:
                     threshold_value=rule.threshold_value,
                     window_seconds=rule.window_seconds,
                     cooldown_seconds=rule.cooldown_seconds,
+                    is_recurring=getattr(rule, "is_recurring", False),
                     is_active=rule.is_active,
                 ))
             logger.info("Loaded %d active alert rules from DB into memory", len(rows))

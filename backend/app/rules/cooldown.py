@@ -18,22 +18,28 @@ class CooldownManager:
         return (current_time - self._last_triggered[rule_id]) >= cooldown_seconds
 
     def should_trigger(
-        self, rule_id: int, is_met: bool, cooldown_seconds: int, now_ts: Optional[float] = None
+        self,
+        rule_id: int,
+        is_met: bool,
+        cooldown_seconds: int,
+        now_ts: Optional[float] = None,
+        is_recurring: bool = False,
     ) -> bool:
         """Determines whether an alert should fire using cooldown AND edge-trigger hysteresis.
 
         - If is_met is False: Disarms the active state so the rule can re-fire when the metric crosses again.
-        - If is_met is True: Only fires if the rule has cooled down AND was not already continuously triggered.
+        - If is_met is True:
+          - If is_recurring is True: Fires whenever the rule has cooled down.
+          - If is_recurring is False: Only fires if cooled down AND was not already continuously triggered.
         """
         if not is_met:
             self._active_condition[rule_id] = False
             return False
 
-        # Condition is met: check if already in continuously triggered state
-        if self._active_condition.get(rule_id, False):
+        if not self.is_cooled_down(rule_id, cooldown_seconds, now_ts):
             return False
 
-        if not self.is_cooled_down(rule_id, cooldown_seconds, now_ts):
+        if not is_recurring and self._active_condition.get(rule_id, False):
             return False
 
         return True

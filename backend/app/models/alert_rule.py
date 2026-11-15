@@ -51,6 +51,9 @@ class AlertRule(Base, TimestampMixin):
     # Cooldown duration in seconds to silence duplicate alerts after triggering
     cooldown_seconds: Mapped[int] = mapped_column(Integer, default=600, nullable=False)
     
+    # Whether alert repeats continuously after cooldown or deactivates upon first trigger
+    is_recurring: Mapped[bool] = mapped_column(Boolean, default=False, nullable=False)
+    
     is_active: Mapped[bool] = mapped_column(Boolean, default=True, index=True, nullable=False)
 
     # Relationships

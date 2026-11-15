@@ -27,6 +27,7 @@ class AlertEvent(BaseModel):
     actual_value: float
     message: str
     triggered_at: datetime
+    is_recurring: bool = False
 
 
 class BroadcastEventType(str, Enum):

@@ -49,6 +49,15 @@ export const RuleCard: React.FC<RuleCardProps> = ({ rule, onDelete }) => {
             {getMetricIcon()}
             <span>{rule.metric_type.replace('_', ' ')}</span>
           </Badge>
+          {rule.is_recurring ? (
+            <Badge variant="outline" className="text-[9px] px-1.5 py-0 border-cyan-500/40 text-cyan-400 bg-cyan-500/10">
+              Recurring
+            </Badge>
+          ) : (
+            <Badge variant="outline" className="text-[9px] px-1.5 py-0 border-border text-muted-foreground">
+              One-time
+            </Badge>
+          )}
         </div>
 
         <div className="text-sm font-semibold font-mono text-foreground">

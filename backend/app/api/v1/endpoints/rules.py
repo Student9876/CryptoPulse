@@ -48,6 +48,7 @@ async def create_user_rule(
         threshold_value=rule_in.threshold_value,
         window_seconds=rule_in.window_seconds,
         cooldown_seconds=rule_in.cooldown_seconds,
+        is_recurring=rule_in.is_recurring,
         is_active=True,
     )
     db.add(db_rule)
@@ -67,6 +68,7 @@ async def create_user_rule(
             threshold_value=db_rule.threshold_value,
             window_seconds=db_rule.window_seconds,
             cooldown_seconds=db_rule.cooldown_seconds,
+            is_recurring=db_rule.is_recurring,
             is_active=True,
         ))
 

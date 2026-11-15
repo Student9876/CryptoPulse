@@ -46,6 +46,7 @@ async def cmd_create_alert(message: types.Message, rule_engine: Optional[RuleEng
             threshold_value=threshold,
             window_seconds=window_sec,
             cooldown_seconds=600,
+            is_recurring=False,
             is_active=True,
         )
         session.add(db_rule)
@@ -63,6 +64,7 @@ async def cmd_create_alert(message: types.Message, rule_engine: Optional[RuleEng
                 threshold_value=threshold,
                 window_seconds=window_sec,
                 cooldown_seconds=600,
+                is_recurring=False,
                 is_active=True,
             ))
 

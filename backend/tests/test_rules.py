@@ -136,3 +136,21 @@ def test_cooldown_suppression():
     # 5. Market crosses back up after re-arming and cooled down -> triggers cleanly
     assert len(engine.evaluate_metrics(metrics_above, now_ts=1400.0)) == 1
 
+
+def test_recurring_alert():
+    engine = RuleEngine()
+    metrics = make_test_metrics(current_price=81000.0)
+    engine.register_rule(CachedRule(
+        id=7, user_id=6, telegram_id=333, symbol="BTCUSDT",
+        metric_type=MetricType.PRICE_LEVEL.value, condition=ConditionType.GREATER_THAN.value,
+        threshold_value=80000.0, cooldown_seconds=300, is_recurring=True,
+    ))
+    # 1. First trigger
+    assert len(engine.evaluate_metrics(metrics, now_ts=1000.0)) == 1
+
+    # 2. Within cooldown period -> suppressed
+    assert len(engine.evaluate_metrics(metrics, now_ts=1010.0)) == 0
+
+    # 3. After cooldown, because is_recurring is True -> triggers again on schedule
+    assert len(engine.evaluate_metrics(metrics, now_ts=1305.0)) == 1
+

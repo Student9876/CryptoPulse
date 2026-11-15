@@ -1,6 +1,6 @@
 import * as React from 'react'
 import { useState } from 'react'
-import { Plus } from 'lucide-react'
+import { Plus, Repeat } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import {
   Dialog,
@@ -38,6 +38,7 @@ export const CreateRuleModal: React.FC<CreateRuleModalProps> = ({
   const [metricType, setMetricType] = useState<MetricType>('PRICE_LEVEL')
   const [condition, setCondition] = useState<ConditionType>('GREATER_THAN')
   const [threshold, setThreshold] = useState('')
+  const [isRecurring, setIsRecurring] = useState(false)
   const [isSubmitting, setIsSubmitting] = useState(false)
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -51,10 +52,12 @@ export const CreateRuleModal: React.FC<CreateRuleModalProps> = ({
       metric_type: metricType,
       condition,
       threshold_value: num,
+      is_recurring: isRecurring,
     })
     setIsSubmitting(false)
     if (success) {
       setThreshold('')
+      setIsRecurring(false)
       onClose()
     }
   }
@@ -132,6 +135,35 @@ export const CreateRuleModal: React.FC<CreateRuleModalProps> = ({
               value={threshold}
               onChange={(e) => setThreshold(e.target.value)}
             />
+          </div>
+
+          <div className="flex items-center justify-between p-3 rounded-xl border border-border/60 bg-secondary/15 transition-colors">
+            <div className="space-y-0.5 pr-2">
+              <div className="flex items-center space-x-1.5">
+                <Repeat className={`w-3.5 h-3.5 ${isRecurring ? 'text-cyan-400' : 'text-muted-foreground'}`} />
+                <span className="text-xs font-semibold text-foreground">Recurring Alert</span>
+              </div>
+              <p className="text-[10px] text-muted-foreground leading-tight">
+                {isRecurring
+                  ? 'Active continuously • Re-alerts after cooldown'
+                  : 'One-time trigger • Auto-deactivates after firing'}
+              </p>
+            </div>
+            <button
+              type="button"
+              role="switch"
+              aria-checked={isRecurring}
+              onClick={() => setIsRecurring(!isRecurring)}
+              className={`relative inline-flex h-5 w-9 shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none ${
+                isRecurring ? 'bg-cyan-500' : 'bg-muted/70'
+              }`}
+            >
+              <span
+                className={`pointer-events-none inline-block h-4 w-4 transform rounded-full bg-white shadow-md transition duration-200 ease-in-out ${
+                  isRecurring ? 'translate-x-4' : 'translate-x-0'
+                }`}
+              />
+            </button>
           </div>
 
           <Button type="submit" disabled={isSubmitting || !threshold} className="w-full mt-2">

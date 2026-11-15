@@ -52,14 +52,14 @@ class AlertDispatcher:
                             triggered_at=event.triggered_at,
                         ))
 
-                        if event.metric_type == MetricType.PRICE_LEVEL.value:
+                        if not event.is_recurring:
                             await session.execute(
                                 update(AlertRule)
                                 .where(AlertRule.id == event.rule_id)
                                 .values(is_active=False)
                             )
                             self.rule_engine.unregister_rule(event.rule_id)
-                            logger.info("Price target achieved for rule #%d. Auto-deactivated.", event.rule_id)
+                            logger.info("One-time alert achieved for rule #%d. Auto-deactivated.", event.rule_id)
 
                         await session.commit()
                 except Exception as db_err:
