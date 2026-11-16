@@ -10,3 +10,11 @@ export interface AlertHistoryItem {
   message: string
   triggered_at: string
 }
+
+export interface PaginatedHistory {
+  items: AlertHistoryItem[]
+  total: number
+  page: number
+  pages: number
+  limit: number
+}

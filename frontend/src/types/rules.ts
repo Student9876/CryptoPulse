@@ -31,3 +31,11 @@ export interface CreateRuleInput {
   cooldown_seconds?: number
   is_recurring?: boolean
 }
+
+export interface PaginatedRules {
+  items: AlertRule[]
+  total: number
+  page: number
+  pages: number
+  limit: number
+}

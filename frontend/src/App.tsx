@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react'
-import { Activity, Bell, History } from 'lucide-react'
+import { Activity, Bell, ExternalLink, History } from 'lucide-react'
 import { Header } from '@/components/layout/Header'
 import { HistoryList } from '@/components/history/HistoryList'
 import { AssetDetailModal } from '@/components/market/AssetDetailModal'
@@ -15,23 +15,51 @@ import { initTelegramApp, triggerHaptic } from '@/lib/telegram'
 
 export default function App() {
   const { overview, feedStatus } = useLiveMarket()
-  const { rules, isLoading: rulesLoading, createRule, deleteRule, refresh: refreshRules } = useAlertRules()
-  const { history, isLoading: historyLoading, refresh: refreshHistory } = useAlertHistory()
+  const {
+    rules,
+    page: rulesPage,
+    totalPages: rulesTotalPages,
+    totalRules,
+    isLoading: rulesLoading,
+    createRule,
+    toggleRuleActive,
+    deleteRule,
+    refresh: refreshRules,
+  } = useAlertRules()
+
+  const {
+    history,
+    page: historyPage,
+    totalPages: historyTotalPages,
+    totalHistory,
+    isLoading: historyLoading,
+    refresh: refreshHistory,
+    clearHistory,
+  } = useAlertHistory()
 
   const [selectedSymbol, setSelectedSymbol] = useState<string | null>(null)
   const [isRuleModalOpen, setIsRuleModalOpen] = useState(false)
   const [defaultRuleSymbol, setDefaultRuleSymbol] = useState('BTCUSDT')
 
+  const isTelegram = typeof window !== 'undefined' && Boolean(window.Telegram?.WebApp?.initData)
+
   useEffect(() => {
     initTelegramApp()
   }, [])
 
+  // Auto-sync when one-time rules trigger on backend and active alert count changes
+  useEffect(() => {
+    if (overview && overview.active_alerts_count !== undefined) {
+      refreshRules(rulesPage)
+    }
+  }, [overview?.active_alerts_count, refreshRules, rulesPage])
+
   const handleTabChange = (value: string) => {
     triggerHaptic('selection')
     if (value === 'rules') {
-      refreshRules()
+      refreshRules(rulesPage)
     } else if (value === 'history') {
-      refreshHistory()
+      refreshHistory(historyPage)
     }
   }
 
@@ -45,6 +73,27 @@ export default function App() {
   return (
     <div className="min-h-screen bg-background text-foreground pb-8 flex flex-col max-w-md mx-auto">
       <Header />
+
+      {!isTelegram && (
+        <div className="mx-3.5 mt-2 p-2.5 rounded-xl border border-cyan-500/30 bg-cyan-500/10 flex items-center justify-between text-xs text-cyan-200">
+          <div className="flex items-center space-x-2">
+            <span className="text-sm">🌐</span>
+            <div>
+              <div className="font-semibold text-cyan-100 text-[11px]">Browser Preview Mode</div>
+              <div className="text-[10px] text-cyan-300/80">Open in Telegram for push alerts</div>
+            </div>
+          </div>
+          <a
+            href="https://t.me/cryptopulse10_bot"
+            target="_blank"
+            rel="noreferrer"
+            className="flex items-center space-x-1 px-2.5 py-1 text-[11px] font-medium rounded-lg bg-cyan-500 text-slate-950 hover:bg-cyan-400 transition-colors"
+          >
+            <span>Open Bot</span>
+            <ExternalLink className="w-3 h-3" />
+          </a>
+        </div>
+      )}
 
       <main className="flex-1 p-3.5 space-y-3.5">
         <Tabs defaultValue="market" onValueChange={handleTabChange} className="w-full">
@@ -82,8 +131,13 @@ export default function App() {
             <RuleList
               rules={rules}
               isLoading={rulesLoading}
+              page={rulesPage}
+              totalPages={rulesTotalPages}
+              totalCount={totalRules}
+              onPageChange={(p) => refreshRules(p)}
               onAddClick={() => setIsRuleModalOpen(true)}
               onDeleteRule={deleteRule}
+              onToggleRule={toggleRuleActive}
             />
           </TabsContent>
 
@@ -91,7 +145,12 @@ export default function App() {
             <HistoryList
               history={history}
               isLoading={historyLoading}
-              onRefresh={refreshHistory}
+              page={historyPage}
+              totalPages={historyTotalPages}
+              totalCount={totalHistory}
+              onPageChange={(p) => refreshHistory(p)}
+              onRefresh={() => refreshHistory(historyPage)}
+              onClearHistory={clearHistory}
             />
           </TabsContent>
         </Tabs>

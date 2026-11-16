@@ -1,5 +1,5 @@
 import * as React from 'react'
-import { Bell, Flame, Percent, Target, Trash2 } from 'lucide-react'
+import { Bell, Flame, Pause, Percent, Play, Target, Trash2 } from 'lucide-react'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { Card } from '@/components/ui/card'
@@ -9,9 +9,10 @@ import type { AlertRule } from '@/types/rules'
 interface RuleCardProps {
   rule: AlertRule
   onDelete: (id: number) => void
+  onToggleActive?: (id: number, nextActive: boolean) => void
 }
 
-export const RuleCard: React.FC<RuleCardProps> = ({ rule, onDelete }) => {
+export const RuleCard: React.FC<RuleCardProps> = ({ rule, onDelete, onToggleActive }) => {
   const getMetricIcon = () => {
     switch (rule.metric_type) {
       case 'PRICE_LEVEL':
@@ -39,7 +40,7 @@ export const RuleCard: React.FC<RuleCardProps> = ({ rule, onDelete }) => {
   }
 
   return (
-    <Card className="p-3.5 border-border/50 bg-card/50 flex items-center justify-between">
+    <Card className={`p-3.5 border-border/50 bg-card/50 flex items-center justify-between transition-opacity ${!rule.is_active ? 'opacity-60' : ''}`}>
       <div className="space-y-1">
         <div className="flex items-center space-x-2">
           <span className="font-bold text-sm tracking-wide text-foreground">
@@ -58,6 +59,11 @@ export const RuleCard: React.FC<RuleCardProps> = ({ rule, onDelete }) => {
               One-time
             </Badge>
           )}
+          {!rule.is_active && (
+            <Badge variant="outline" className="text-[9px] px-1.5 py-0 border-amber-500/40 text-amber-400 bg-amber-500/10">
+              Paused
+            </Badge>
+          )}
         </div>
 
         <div className="text-sm font-semibold font-mono text-foreground">
@@ -69,14 +75,27 @@ export const RuleCard: React.FC<RuleCardProps> = ({ rule, onDelete }) => {
         </div>
       </div>
 
-      <Button
-        variant="ghost"
-        size="icon"
-        className="h-8 w-8 text-muted-foreground hover:text-rose-400 hover:bg-rose-500/10"
-        onClick={() => onDelete(rule.id)}
-      >
-        <Trash2 className="w-4 h-4" />
-      </Button>
+      <div className="flex items-center space-x-1">
+        {onToggleActive && (
+          <Button
+            variant="ghost"
+            size="icon"
+            className="h-8 w-8 text-muted-foreground hover:text-cyan-400 hover:bg-cyan-500/10"
+            title={rule.is_active ? 'Pause Rule' : 'Resume Rule'}
+            onClick={() => onToggleActive(rule.id, !rule.is_active)}
+          >
+            {rule.is_active ? <Pause className="w-3.5 h-3.5" /> : <Play className="w-3.5 h-3.5 text-cyan-400" />}
+          </Button>
+        )}
+        <Button
+          variant="ghost"
+          size="icon"
+          className="h-8 w-8 text-muted-foreground hover:text-rose-400 hover:bg-rose-500/10"
+          onClick={() => onDelete(rule.id)}
+        >
+          <Trash2 className="w-4 h-4" />
+        </Button>
+      </div>
     </Card>
   )
 }
