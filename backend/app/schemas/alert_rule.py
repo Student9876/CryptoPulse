@@ -1,7 +1,7 @@
 """Pydantic schemas for AlertRule and AlertHistory entities."""
 
 from datetime import datetime
-from typing import Optional
+from typing import List, Optional
 from pydantic import BaseModel, ConfigDict, Field
 
 from app.models.alert_rule import ConditionType, MetricType
@@ -48,4 +48,20 @@ class AlertHistoryRead(BaseModel):
     triggered_at: datetime
 
     model_config = ConfigDict(from_attributes=True)
+
+
+class PaginatedRulesResponse(BaseModel):
+    items: List[AlertRuleRead]
+    total: int
+    page: int
+    pages: int
+    limit: int
+
+
+class PaginatedHistoryResponse(BaseModel):
+    items: List[AlertHistoryRead]
+    total: int
+    page: int
+    pages: int
+    limit: int
 

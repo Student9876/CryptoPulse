@@ -99,3 +99,24 @@ async def test_get_history_records_and_isolation(
     data_b = res_b.json()
     assert len(data_b) == 1
     assert data_b[0]["symbol"] == "SOLUSDT"
+
+    # 5. User A paginates history
+    res_page = await async_client.get("/api/v1/history/?page=1&limit=1", headers=headers_a)
+    assert res_page.status_code == 200
+    page_data = res_page.json()
+    assert page_data["total"] == 2
+    assert page_data["page"] == 1
+    assert len(page_data["items"]) == 1
+
+    # 6. User A clears history
+    res_clear = await async_client.delete("/api/v1/history/", headers=headers_a)
+    assert res_clear.status_code == 200
+    assert res_clear.json()["status"] == "cleared"
+    assert res_clear.json()["deleted_count"] == 2
+
+    # Verify User A history is now empty, but User B is unaffected
+    res_a_empty = await async_client.get("/api/v1/history/", headers=headers_a)
+    assert res_a_empty.json() == []
+
+    res_b_still_there = await async_client.get("/api/v1/history/", headers=headers_b)
+    assert len(res_b_still_there.json()) == 1

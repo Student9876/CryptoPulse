@@ -89,3 +89,55 @@ async def test_delete_rule_and_isolation(async_client: AsyncClient, override_db,
 
     # Rule must be removed from in-memory engine
     assert rule_id not in rule_engine.rules
+
+
+@pytest.mark.asyncio
+async def test_patch_rule_and_pagination(async_client: AsyncClient, override_db, db_session: AsyncSession):
+    """Verifies rule update (pause/resume) and paginated retrieval."""
+    rule_engine = RuleEngine()
+    app.state.rule_engine = rule_engine
+    headers = {"X-Dev-Telegram-Id": "33333"}
+
+    # 1. Create Rule
+    res_post = await async_client.post(
+        "/api/v1/rules/",
+        json={
+            "symbol": "SOLUSDT",
+            "metric_type": MetricType.PRICE_LEVEL.value,
+            "condition": ConditionType.GREATER_THAN.value,
+            "threshold_value": 200.0,
+        },
+        headers=headers,
+    )
+    assert res_post.status_code == 201
+    rule_id = res_post.json()["id"]
+    assert rule_id in rule_engine.rules
+
+    # 2. Pause Rule via PATCH
+    res_patch = await async_client.patch(
+        f"/api/v1/rules/{rule_id}",
+        json={"is_active": False},
+        headers=headers,
+    )
+    assert res_patch.status_code == 200
+    assert res_patch.json()["is_active"] is False
+    assert rule_id not in rule_engine.rules
+
+    # 3. Resume Rule via PATCH
+    res_resume = await async_client.patch(
+        f"/api/v1/rules/{rule_id}",
+        json={"is_active": True},
+        headers=headers,
+    )
+    assert res_resume.status_code == 200
+    assert res_resume.json()["is_active"] is True
+    assert rule_id in rule_engine.rules
+
+    # 4. Paginated List Rules
+    res_page = await async_client.get("/api/v1/rules/?page=1&limit=5", headers=headers)
+    assert res_page.status_code == 200
+    page_data = res_page.json()
+    assert "items" in page_data
+    assert page_data["total"] == 1
+    assert page_data["page"] == 1
+    assert len(page_data["items"]) == 1
