@@ -1,0 +1,11 @@
+Scenario,Description,Ticks,Expected,Actual,TP,FP,FN,TN,Precision,Recall,F1,Passed
+Threshold Greater Than,Triggers exactly once when price crosses above target threshold.,4,1,1,1,0,0,3,1.0,1.0,1.0,True
+Threshold Less Than,Triggers when price falls below target threshold.,4,1,1,1,0,0,3,1.0,1.0,1.0,True
+Cooldown Suppression,Suppresses subsequent triggers within the active cooldown window (60s).,4,1,1,1,0,0,3,1.0,1.0,1.0,True
+Cooldown Expiration (Recurring),Re-triggers on breach after the cooldown interval expires for recurring alerts.,3,2,2,2,0,0,1,1.0,1.0,1.0,True
+Non-Recurring One-Shot Deactivation,"One-time alert fires once, unregisters from RAM, and never fires again.",3,1,1,1,0,0,2,1.0,1.0,1.0,True
+Flapping Hysteresis,Re-arms edge trigger when condition dips below threshold and re-crosses after cooldown.,3,2,2,2,0,0,1,1.0,1.0,1.0,True
+Boundary Exact Equality,"Verifies >= boundary: exact threshold value triggers, 0.01 below does not.",2,1,1,1,0,0,1,1.0,1.0,1.0,True
+Duplicate Flood Suppression,Blocks 49 consecutive ticks above threshold within cooldown (0 duplicate alerts).,50,1,1,1,0,0,49,1.0,1.0,1.0,True
+Non-Trigger Noise Rejection,Verifies 100% false positive rejection (0 triggers for noise below target).,100,0,0,0,0,0,100,1.0,1.0,1.0,True
+Multi-Symbol Isolation,Guarantees events on one symbol never falsely trigger rules on another.,4,1,1,1,0,0,3,1.0,1.0,1.0,True

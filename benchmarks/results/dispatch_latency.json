@@ -1,0 +1,40 @@
+{
+  "total_alerts": 150,
+  "successful_dispatches": 150,
+  "failed_dispatches": 0,
+  "duration_seconds": 6.9104,
+  "throughput_alerts_per_sec": 21.71,
+  "simulated_api_delay_ms": 30.0,
+  "queue_latency": {
+    "p50_ms": 3459.86,
+    "p95_ms": 6543.721,
+    "p99_ms": 6815.87,
+    "mean_ms": 3434.796,
+    "min_ms": 0.701,
+    "max_ms": 6861.192
+  },
+  "telegram_api_latency": {
+    "p50_ms": 43.913,
+    "p95_ms": 45.167,
+    "p99_ms": 45.494,
+    "mean_ms": 43.941,
+    "min_ms": 41.969,
+    "max_ms": 45.954
+  },
+  "db_persistence_latency": {
+    "p50_ms": 2.108,
+    "p95_ms": 2.412,
+    "p99_ms": 3.003,
+    "mean_ms": 2.108,
+    "min_ms": 1.576,
+    "max_ms": 3.063
+  },
+  "total_latency": {
+    "p50_ms": 3505.306,
+    "p95_ms": 6588.528,
+    "p99_ms": 6861.184,
+    "mean_ms": 3480.845,
+    "min_ms": 47.488,
+    "max_ms": 6909.058
+  }
+}

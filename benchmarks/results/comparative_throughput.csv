@@ -1,0 +1,7 @@
+Workload,Baseline_eps,Optimized_eps,Speedup_Factor,Baseline_p95_us,Optimized_p95_us,Latency_Reduction_pct,Baseline_RAM_mb,Optimized_RAM_mb,RAM_Overhead_mb
+Window Ingestion Only,808178.77,262253.81,0.32,1.6,5.8,-262.5,83.21,83.84,0.63
+Window + Metrics (Cold Start),708.09,49834.85,70.38,2855.25,34.2,98.8,83.13,83.05,-0.08
+Window + Metrics (Steady State),585.14,53126.78,90.79,2715.6,33.7,98.76,94.2,94.27,0.07
+Full Pipeline (5 Rules),576.3,28055.87,48.68,2773.35,53.4,98.07,93.79,93.96,0.17
+Full Pipeline (25 Rules),503.76,22998.02,45.65,3408.95,71.7,97.9,94.32,94.46,0.14
+Full Pipeline (100 Rules),576.73,11700.08,20.29,2891.2,156.5,94.59,95.57,95.73,0.16

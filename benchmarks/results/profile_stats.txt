@@ -1,0 +1,78 @@
+         639910 function calls in 0.512 seconds
+
+   Ordered by: cumulative time
+   List reduced from 94 to 30 due to restriction <30>
+
+   ncalls  tottime  percall  cumtime  percall filename:lineno(function)
+    10000    0.012    0.000    0.251    0.000 D:\Project\Python\CryptoPulse\backend\app\stream\window_manager.py:34(get_metrics)
+    10000    0.111    0.000    0.236    0.000 D:\Project\Python\CryptoPulse\backend\app\stream\symbol_window.py:407(compute_metrics)
+    10000    0.010    0.000    0.137    0.000 D:\Project\Python\CryptoPulse\backend\app\stream\window_manager.py:31(process_trade)
+    10000    0.059    0.000    0.124    0.000 D:\Project\Python\CryptoPulse\backend\app\rules\evaluator.py:54(evaluate_metrics)
+    10000    0.065    0.000    0.119    0.000 D:\Project\Python\CryptoPulse\backend\app\stream\symbol_window.py:198(add_trade)
+   124009    0.072    0.000    0.072    0.000 {built-in method builtins.round}
+    13334    0.021    0.000    0.041    0.000 D:\Project\Python\CryptoPulse\backend\app\rules\evaluator.py:35(_extract_metric_value)
+    10000    0.035    0.000    0.037    0.000 D:\Project\Python\CryptoPulse\backend\app\stream\symbol_window.py:265(_prune_all)
+    10005    0.007    0.000    0.031    0.000 D:\Project\Python\CryptoPulse\.venv\Lib\site-packages\pydantic\main.py:253(__init__)
+    46680    0.020    0.000    0.027    0.000 C:\Users\enzeon\AppData\Local\Python\pythoncore-3.11-64\Lib\enum.py:193(__get__)
+    10005    0.024    0.000    0.024    0.000 {method 'validate_python' of 'pydantic_core._pydantic_core.SchemaValidator' objects}
+   100003    0.011    0.000    0.011    0.000 {method 'upper' of 'str' objects}
+    10005    0.009    0.000    0.009    0.000 {built-in method fromtimestamp}
+    10000    0.007    0.000    0.008    0.000 D:\Project\Python\CryptoPulse\backend\app\stream\window_manager.py:25(get_or_create_window)
+    10000    0.008    0.000    0.008    0.000 D:\Project\Python\CryptoPulse\backend\app\stream\symbol_window.py:251(_update_volume_buckets)
+    39999    0.008    0.000    0.008    0.000 {built-in method builtins.max}
+    46680    0.008    0.000    0.008    0.000 C:\Users\enzeon\AppData\Local\Python\pythoncore-3.11-64\Lib\enum.py:1257(value)
+    60005    0.006    0.000    0.006    0.000 {method 'append' of 'collections.deque' objects}
+    13334    0.005    0.000    0.005    0.000 D:\Project\Python\CryptoPulse\backend\app\rules\cooldown.py:20(should_trigger)
+    19596    0.002    0.000    0.002    0.000 {method 'pop' of 'collections.deque' objects}
+    14025    0.002    0.000    0.002    0.000 {built-in method builtins.len}
+    10010    0.002    0.000    0.002    0.000 {method 'get' of 'dict' objects}
+    16818    0.002    0.000    0.002    0.000 {method 'popleft' of 'collections.deque' objects}
+     9994    0.002    0.000    0.002    0.000 {built-in method math.sqrt}
+    10000    0.002    0.000    0.002    0.000 {method 'values' of 'dict' objects}
+     4010    0.001    0.000    0.001    0.000 {built-in method builtins.sum}
+        5    0.000    0.000    0.001    0.000 C:\Users\enzeon\AppData\Local\Python\pythoncore-3.11-64\Lib\logging\__init__.py:1491(warning)
+        5    0.000    0.000    0.001    0.000 C:\Users\enzeon\AppData\Local\Python\pythoncore-3.11-64\Lib\logging\__init__.py:1610(_log)
+      928    0.001    0.000    0.001    0.000 D:\Project\Python\CryptoPulse\backend\app\rules\cooldown.py:14(is_cooled_down)
+        5    0.000    0.000    0.000    0.000 C:\Users\enzeon\AppData\Local\Python\pythoncore-3.11-64\Lib\logging\__init__.py:1636(handle)
+
+
+
+================================================================================
+         639910 function calls in 0.512 seconds
+
+   Ordered by: internal time
+   List reduced from 94 to 30 due to restriction <30>
+
+   ncalls  tottime  percall  cumtime  percall filename:lineno(function)
+    10000    0.111    0.000    0.236    0.000 D:\Project\Python\CryptoPulse\backend\app\stream\symbol_window.py:407(compute_metrics)
+   124009    0.072    0.000    0.072    0.000 {built-in method builtins.round}
+    10000    0.065    0.000    0.119    0.000 D:\Project\Python\CryptoPulse\backend\app\stream\symbol_window.py:198(add_trade)
+    10000    0.059    0.000    0.124    0.000 D:\Project\Python\CryptoPulse\backend\app\rules\evaluator.py:54(evaluate_metrics)
+    10000    0.035    0.000    0.037    0.000 D:\Project\Python\CryptoPulse\backend\app\stream\symbol_window.py:265(_prune_all)
+    10005    0.024    0.000    0.024    0.000 {method 'validate_python' of 'pydantic_core._pydantic_core.SchemaValidator' objects}
+    13334    0.021    0.000    0.041    0.000 D:\Project\Python\CryptoPulse\backend\app\rules\evaluator.py:35(_extract_metric_value)
+    46680    0.020    0.000    0.027    0.000 C:\Users\enzeon\AppData\Local\Python\pythoncore-3.11-64\Lib\enum.py:193(__get__)
+    10000    0.012    0.000    0.251    0.000 D:\Project\Python\CryptoPulse\backend\app\stream\window_manager.py:34(get_metrics)
+   100003    0.011    0.000    0.011    0.000 {method 'upper' of 'str' objects}
+    10000    0.010    0.000    0.137    0.000 D:\Project\Python\CryptoPulse\backend\app\stream\window_manager.py:31(process_trade)
+    10005    0.009    0.000    0.009    0.000 {built-in method fromtimestamp}
+    10000    0.008    0.000    0.008    0.000 D:\Project\Python\CryptoPulse\backend\app\stream\symbol_window.py:251(_update_volume_buckets)
+    39999    0.008    0.000    0.008    0.000 {built-in method builtins.max}
+    46680    0.008    0.000    0.008    0.000 C:\Users\enzeon\AppData\Local\Python\pythoncore-3.11-64\Lib\enum.py:1257(value)
+    10000    0.007    0.000    0.008    0.000 D:\Project\Python\CryptoPulse\backend\app\stream\window_manager.py:25(get_or_create_window)
+    10005    0.007    0.000    0.031    0.000 D:\Project\Python\CryptoPulse\.venv\Lib\site-packages\pydantic\main.py:253(__init__)
+    60005    0.006    0.000    0.006    0.000 {method 'append' of 'collections.deque' objects}
+    13334    0.005    0.000    0.005    0.000 D:\Project\Python\CryptoPulse\backend\app\rules\cooldown.py:20(should_trigger)
+    19596    0.002    0.000    0.002    0.000 {method 'pop' of 'collections.deque' objects}
+    14025    0.002    0.000    0.002    0.000 {built-in method builtins.len}
+    10010    0.002    0.000    0.002    0.000 {method 'get' of 'dict' objects}
+    16818    0.002    0.000    0.002    0.000 {method 'popleft' of 'collections.deque' objects}
+     9994    0.002    0.000    0.002    0.000 {built-in method math.sqrt}
+    10000    0.002    0.000    0.002    0.000 {method 'values' of 'dict' objects}
+     4010    0.001    0.000    0.001    0.000 {built-in method builtins.sum}
+      928    0.001    0.000    0.001    0.000 D:\Project\Python\CryptoPulse\backend\app\rules\cooldown.py:14(is_cooled_down)
+        5    0.000    0.000    0.000    0.000 {method 'write' of '_io.TextIOWrapper' objects}
+        5    0.000    0.000    0.000    0.000 C:\Users\enzeon\AppData\Local\Python\pythoncore-3.11-64\Lib\logging\__init__.py:292(__init__)
+        5    0.000    0.000    0.000    0.000 D:\Project\Python\CryptoPulse\backend\app\rules\formatter.py:8(format_alert_message)
+
+
