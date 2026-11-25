@@ -11,7 +11,12 @@ from app.stream.symbol_window import SymbolWindow
 class WindowManager:
     """Coordinates sliding windows, metrics aggregation, and market overviews."""
 
-    def __init__(self, symbols: Optional[List[str]] = None) -> None:
+    def __init__(
+        self,
+        symbols: Optional[List[str]] = None,
+        window_cls: type = SymbolWindow,
+    ) -> None:
+        self.window_cls = window_cls
         self.windows: Dict[str, SymbolWindow] = {}
         if symbols:
             for s in symbols:
@@ -20,7 +25,7 @@ class WindowManager:
     def get_or_create_window(self, symbol: str) -> SymbolWindow:
         sym = symbol.upper()
         if sym not in self.windows:
-            self.windows[sym] = SymbolWindow(sym)
+            self.windows[sym] = self.window_cls(sym)
         return self.windows[sym]
 
     def process_trade(self, trade: TradeEvent) -> None:
