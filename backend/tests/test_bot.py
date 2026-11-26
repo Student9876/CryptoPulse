@@ -88,6 +88,19 @@ async def test_alert_dispatcher_worker(db_session: AsyncSession, monkeypatch):
     await db_session.commit()
     await db_session.refresh(user)
 
+    rule = AlertRule(
+        user_id=user.id,
+        symbol="BTCUSDT",
+        metric_type="PRICE_LEVEL",
+        condition="GREATER_THAN",
+        threshold_value=80000.0,
+        is_recurring=False,
+        is_active=True,
+    )
+    db_session.add(rule)
+    await db_session.commit()
+    await db_session.refresh(rule)
+
     rule_engine = RuleEngine()
     mock_bot = MagicMock()
     mock_bot.send_message = AsyncMock()
@@ -96,9 +109,10 @@ async def test_alert_dispatcher_worker(db_session: AsyncSession, monkeypatch):
     worker.start()
 
     event = AlertEvent(
-        rule_id=1, user_id=user.id, telegram_id=user.telegram_id, symbol="BTCUSDT",
+        rule_id=rule.id, user_id=user.id, telegram_id=user.telegram_id, symbol="BTCUSDT",
         metric_type="PRICE_LEVEL", condition="GREATER_THAN", threshold_value=80000.0,
         actual_value=80500.0, message="BTC price alert!", triggered_at=datetime.now(timezone.utc),
+        is_recurring=False,
     )
     await rule_engine.alert_queue.put(event)
     await rule_engine.alert_queue.join()
@@ -109,6 +123,11 @@ async def test_alert_dispatcher_worker(db_session: AsyncSession, monkeypatch):
     history = (await db_session.execute(stmt)).scalars().all()
     assert len(history) == 1
     assert history[0].symbol == "BTCUSDT"
+
+    # Verify rule was automatically deactivated upon one-time trigger but preserved in DB
+    rule_check = (await db_session.execute(select(AlertRule).where(AlertRule.id == rule.id))).scalar_one_or_none()
+    assert rule_check is not None
+    assert rule_check.is_active is False
 
 
 @pytest.mark.asyncio

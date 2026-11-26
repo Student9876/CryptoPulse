@@ -71,6 +71,7 @@ class RuleEngine:
                 if not rule.is_recurring:
                     rule.is_active = False
                     self.rules.pop(rule.id, None)
+                    self.cooldown_manager.reset(rule.id)
 
                 event = AlertEvent(
                     rule_id=rule.id,
